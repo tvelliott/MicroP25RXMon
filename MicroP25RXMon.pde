@@ -47,6 +47,7 @@ float[] iq_samples;
 int iq_idx;
 
 int audio_tick=0;
+int audio_buf_cnt=0;
 int metamod=0;
 
 AudioFormat format;
@@ -62,7 +63,6 @@ int port_idx=0;
 int port_to=0;
 String port_name;
 int avail=0;
-
 
 color col1;
 color col2;
@@ -186,6 +186,7 @@ void draw()
     audio_tick--;
     if(audio_tick==0) {
       sourceDataLine.stop();
+      audio_buf_cnt=0;
     }
   }
 } 
@@ -311,7 +312,7 @@ void play_audio(byte[] b, int len) {
  
   sourceDataLine.write(outbytes,0,idx); 
   //if(frame_cnt++%9==0 && !sourceDataLine.isRunning()) sourceDataLine.start();
-  sourceDataLine.start();
+  if(audio_buf_cnt++>4) sourceDataLine.start();
 }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
