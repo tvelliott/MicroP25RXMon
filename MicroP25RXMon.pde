@@ -331,6 +331,9 @@ void draw_audio(byte[] b, int len) {
  
  for(int i=0;i<len/2;i++) {
    samples[i] = (short) bb.getShort();
+   samples[i] /= 128;
+   if( samples[i]>128 ) samples[i]=128;
+   if( samples[i]<-128 ) samples[i]=-128;
  }
  
 
@@ -344,7 +347,7 @@ void draw_audio(byte[] b, int len) {
   //draw the audio
  int step=2;
  for(int i=0;i<len/2;i++) {
-   if(i>0) line(i*step,64+samples[i-1]/128, (i*step+1), 64+samples[i]/128);
+   if(i>0) line(i*step,64+samples[i-1], (i*step+1), 64+samples[i]);
  }
 }
 ///////////////////////////////////////////////////////////////////////////////////
