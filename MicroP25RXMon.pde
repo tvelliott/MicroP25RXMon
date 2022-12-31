@@ -308,11 +308,13 @@ void play_audio(byte[] b, int len) {
     idx2+=2;
   }
 
-  audio_tick=30;
  
   sourceDataLine.write(outbytes,0,idx); 
   //if(frame_cnt++%9==0 && !sourceDataLine.isRunning()) sourceDataLine.start();
-  if(audio_buf_cnt++>4) sourceDataLine.start();
+  if(audio_buf_cnt++>4) {
+    audio_tick=30;
+    sourceDataLine.start();
+  }
 }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
