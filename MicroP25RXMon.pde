@@ -187,6 +187,11 @@ void draw()
     if(audio_tick==0) {
       sourceDataLine.stop();
       audio_buf_cnt=0;
+
+       stroke(0,0,0);
+       fill(0,0,0);
+       rect(0,0,512,128); //blank to background
+
     }
   }
 } 
