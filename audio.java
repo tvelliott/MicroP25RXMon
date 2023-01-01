@@ -3,11 +3,65 @@ import javax.sound.sampled.*;
 
 
 class audio {
+
+  java.util.Timer utimer;
+  volatile int do_new_audio=0;
+  byte[] outbytes;
+  byte[] inbytes;
+  int audio_len;
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  class audio_thread extends java.util.TimerTask {
+
+      public void run()
+      {
+        try {
+          while(true) {
+            if(do_new_audio>0) {
+
+              ByteBuffer bb = ByteBuffer.wrap(inbytes);
+              bb.order(ByteOrder.LITTLE_ENDIAN);
+
+              int idx=0;
+              int idx2=0;
+              for(int i=0;i<audio_len/2;i++) {
+
+                short val = bb.getShort(); 
+              
+                outbytes[idx+0] = (byte) (val&0xff); 
+                outbytes[idx+1] = (byte) (val>>8);
+
+                outbytes[idx+2] = outbytes[idx+0]; 
+                outbytes[idx+3] = outbytes[idx+1]; 
+
+                idx+=4;
+                idx2+=2;
+              }
+
+             
+              sourceDataLine.write(outbytes,0,idx); 
+              //if(frame_cnt++%9==0 && !sourceDataLine.isRunning()) sourceDataLine.start();
+              if(audio_buf_cnt++>4) {
+                audio_tick_cnt=30;
+                sourceDataLine.start();
+              }
+            }
+
+            do_new_audio=0;
+            Thread.sleep(0, 100);
+          }
+
+        } catch(Exception e) {
+        }
+      }
+  }
   
-int audio_tick_cnt=0;
+public int audio_tick_cnt=0;
 int audio_buf_cnt=0;
 AudioFormat format;
 SourceDataLine sourceDataLine;
+
   ///////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////
   public audio() {
@@ -19,6 +73,12 @@ SourceDataLine sourceDataLine;
       e.printStackTrace();
     }
     
+    try {
+			utimer = new java.util.Timer(); 
+      utimer.schedule( new audio_thread(), 100, 1);
+    } catch(Exception e) {
+      e.printStackTrace();
+    }
     
   }
     
@@ -37,33 +97,16 @@ SourceDataLine sourceDataLine;
   ///////////////////////////////////////////////////////////////////////////////////
   void play_audio(byte[] b, int len) {
 
-    byte[] outbytes = new byte[ len*4 ]; 
+    while(do_new_audio==1);
 
-    ByteBuffer bb = ByteBuffer.wrap(b);
-    bb.order(ByteOrder.LITTLE_ENDIAN);
+    if(inbytes==null || inbytes.length!=len) inbytes = new byte[len];
+    if(outbytes==null || outbytes.length!=len*4) outbytes = new byte[ len*4 ]; 
 
-    int idx=0;
-    int idx2=0;
-    for(int i=0;i<len/2;i++) {
-
-      short val = bb.getShort(); 
-    
-      outbytes[idx+0] = (byte) (val&0xff); 
-      outbytes[idx+1] = (byte) (val>>8);
-
-      outbytes[idx+2] = outbytes[idx+0]; 
-      outbytes[idx+3] = outbytes[idx+1]; 
-
-      idx+=4;
-      idx2+=2;
+    for(int i=0;i<len;i++) {
+      inbytes[i] = b[i];
     }
 
-   
-    sourceDataLine.write(outbytes,0,idx); 
-    //if(frame_cnt++%9==0 && !sourceDataLine.isRunning()) sourceDataLine.start();
-    if(audio_buf_cnt++>4) {
-      audio_tick_cnt=30;
-      sourceDataLine.start();
-    }
+    audio_len = len;
+    do_new_audio=1;
   }
 }
