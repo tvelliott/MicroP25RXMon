@@ -282,7 +282,7 @@ void draw_audio(byte[] b, int len) {
  
  for(int i=0;i<len/2;i++) {
    samples[i] = (short) bb.getShort();
-   samples[i] /= 128;
+   samples[i] /= 256;
    if( samples[i]>128 ) samples[i]=128;
    if( samples[i]<-128 ) samples[i]=-128;
  }
