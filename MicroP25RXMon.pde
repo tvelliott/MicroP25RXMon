@@ -23,7 +23,7 @@
 
 import processing.serial.*;
 import java.nio.*;
-import javax.sound.sampled.*;
+
 
 //change these lines if you need to. 1=enable, 0=disable
 int have_gpu=1;
@@ -46,15 +46,9 @@ int port;
 float[] iq_samples;
 int iq_idx;
 
-int audio_tick=0;
-int audio_buf_cnt=0;
-int metamod=0;
-
-AudioFormat format;
 
 int frame_cnt=0;
-SourceDataLine sourceDataLine;
-
+int metamod=0;
 int serial_packet_count=0;
 int found_port=0;
 
@@ -90,6 +84,7 @@ color col_def_indicator;
 color col_def_const;
 
 String dmod = "";
+audio aud;
 
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
@@ -108,15 +103,8 @@ void setup()
   println("-----------------------");
   printArray(Serial.list());
   println("-----------------------");
-
-
-  format = new AudioFormat(7950, 16, 2, true, false); //last boolean is endian-type (false=little)
-  try {
-    sourceDataLine = AudioSystem.getSourceDataLine( format);
-    sourceDataLine.open(format, 8000);
-  } catch(Exception e) {
-    e.printStackTrace();
-  }
+ 
+  aud = new audio();
 
 }
 ///////////////////////////////////////////////////////////////////////////////////
@@ -181,18 +169,13 @@ void draw()
       }
     }
   }
-
-  if(audio_tick>0) {
-    audio_tick--;
-    if(audio_tick==0) {
-      sourceDataLine.stop();
-      audio_buf_cnt=0;
-
-       stroke(0,0,0);
-       fill(0,0,0);
-       rect(0,0,512,128); //blank to background
-
-    }
+  
+  aud.audio_tick();
+  
+  if(aud.audio_tick_cnt==0) {
+   stroke(0,0,0);
+   fill(0,0,0);
+   rect(0,0,512,128); //blank to background
   }
 } 
 
@@ -254,7 +237,7 @@ void process_buffer(byte b) {
         break;
         case  2 :
           if(have_gpu>0) draw_audio(buf,buf_len);
-          play_audio(buf,buf_len);
+          aud.play_audio(buf,buf_len);
           serial_packet_count++;
           port_to=60;
         break;
@@ -288,39 +271,7 @@ void process_buffer(byte b) {
  
 }
 
-///////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////
-void play_audio(byte[] b, int len) {
 
-  byte[] outbytes = new byte[ len*4 ]; 
-
-  ByteBuffer bb = ByteBuffer.wrap(b);
-  bb.order(ByteOrder.LITTLE_ENDIAN);
-
-  int idx=0;
-  int idx2=0;
-  for(int i=0;i<len/2;i++) {
-
-    short val = bb.getShort(); 
-  
-    outbytes[idx+0] = (byte) (val&0xff); 
-    outbytes[idx+1] = (byte) (val>>8);
-
-    outbytes[idx+2] = outbytes[idx+0]; 
-    outbytes[idx+3] = outbytes[idx+1]; 
-
-    idx+=4;
-    idx2+=2;
-  }
-
- 
-  sourceDataLine.write(outbytes,0,idx); 
-  //if(frame_cnt++%9==0 && !sourceDataLine.isRunning()) sourceDataLine.start();
-  if(audio_buf_cnt++>4) {
-    audio_tick=30;
-    sourceDataLine.start();
-  }
-}
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
 void draw_audio(byte[] b, int len) {
