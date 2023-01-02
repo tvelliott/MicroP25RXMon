@@ -49,7 +49,7 @@ class audio {
 
                 outbytes[idx+0] = (byte) inbytes[out_s++]; 
                 outbytes[idx+1] = (byte) inbytes[out_s++]; 
-                if(out_s==32768) out_s=0;
+                if(out_s>=32000) out_s=0;
 
                 outbytes[idx+2] = outbytes[idx+0]; 
                 outbytes[idx+3] = outbytes[idx+1]; 
@@ -124,7 +124,7 @@ SourceDataLine sourceDataLine;
   void play_audio(byte[] b, int len) {
     for(int i=0;i<len;i++) {
       inbytes[out_e++] = b[i];
-      if(out_e==32768) out_e=0;
+      if(out_e>=32000) out_e=0;
     }
   }
 }
