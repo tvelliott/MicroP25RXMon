@@ -31,7 +31,7 @@ class audio {
   volatile byte[] outbytes;
   volatile int out_s=0;
   volatile int out_e=0;
-
+  volatile int audio_cnt;
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,11 +60,11 @@ class audio {
               sourceDataLine.write(outbytes,0,idx); 
 
               audio_tick_cnt=60;
-              sourceDataLine.start();
+              if(audio_cnt++>3) sourceDataLine.start();
             }
 
             if(audio_tick_cnt==10) {
-              for(int i=0;i<160*2;i++) {
+              for(int i=0;i<160*4;i++) {
                 outbytes[i]=0;
               }
               sourceDataLine.write(outbytes,0,160*2); 
@@ -93,7 +93,7 @@ SourceDataLine sourceDataLine;
     outbytes = new byte[32768];
     try {
       sourceDataLine = AudioSystem.getSourceDataLine( format);
-      sourceDataLine.open(format, 640*4);
+      sourceDataLine.open(format, 640*8);
     } catch(Exception e) {
       e.printStackTrace();
     }
@@ -115,6 +115,7 @@ SourceDataLine sourceDataLine;
       if(audio_tick_cnt==0) {
         sourceDataLine.stop();
         audio_buf_cnt=0;
+        audio_cnt=0;
       }
     }
   }
