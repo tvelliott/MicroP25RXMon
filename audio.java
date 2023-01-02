@@ -29,8 +29,8 @@ class audio {
   java.util.Timer utimer;
   volatile byte[] inbytes;
   volatile byte[] outbytes;
-  volatile int out_s=0;
-  volatile int out_e=0;
+  volatile short out_s=0;
+  volatile short out_e=0;
   volatile int audio_cnt;
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,8 +48,9 @@ class audio {
               while(out_s!=out_e) { 
 
                 outbytes[idx+0] = (byte) inbytes[out_s++]; 
+                if(out_s<0) out_s=0;
                 outbytes[idx+1] = (byte) inbytes[out_s++]; 
-                if(out_s>=16384) out_s=0;
+                if(out_s<0) out_s=0;
 
                 outbytes[idx+2] = outbytes[idx+0]; 
                 outbytes[idx+3] = outbytes[idx+1]; 
@@ -124,7 +125,7 @@ SourceDataLine sourceDataLine;
   void play_audio(byte[] b, int len) {
     for(int i=0;i<len;i++) {
       inbytes[out_e++] = b[i];
-      if(out_e>=16384) out_e=0;
+      if(out_e<0) out_e=0;
     }
   }
 }
