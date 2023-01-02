@@ -27,10 +27,11 @@ import javax.sound.sampled.*;
 class audio {
 
   java.util.Timer utimer;
-  volatile int do_new_audio=0;
-  byte[] outbytes;
-  byte[] inbytes;
-  int audio_len;
+  volatile byte[] inbytes;
+  volatile byte[] outbytes;
+  volatile int out_s=0;
+  volatile int out_e=0;
+
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,42 +40,42 @@ class audio {
       public void run()
       {
         try {
-          while(true) {
-            if(do_new_audio>0) {
+         while(true) {
 
-              ByteBuffer bb = ByteBuffer.wrap(inbytes);
-              bb.order(ByteOrder.LITTLE_ENDIAN);
+           if(out_s!=out_e) {
 
               int idx=0;
-              int idx2=0;
-              for(int i=0;i<audio_len/2;i++) {
+              while(out_s!=out_e) { 
 
-                short val = bb.getShort(); 
-              
-                outbytes[idx+0] = (byte) (val&0xff); 
-                outbytes[idx+1] = (byte) (val>>8);
+                outbytes[idx+0] = (byte) inbytes[out_s++]; 
+                outbytes[idx+1] = (byte) inbytes[out_s++]; 
+                if(out_s==32768) out_s=0;
 
                 outbytes[idx+2] = outbytes[idx+0]; 
                 outbytes[idx+3] = outbytes[idx+1]; 
 
                 idx+=4;
-                idx2+=2;
               }
 
-             
               sourceDataLine.write(outbytes,0,idx); 
-              //if(frame_cnt++%9==0 && !sourceDataLine.isRunning()) sourceDataLine.start();
-              if(audio_buf_cnt++>4) {
-                audio_tick_cnt=30;
-                sourceDataLine.start();
-              }
+
+              audio_tick_cnt=60;
+              sourceDataLine.start();
             }
 
-            do_new_audio=0;
+            if(audio_tick_cnt==10) {
+              for(int i=0;i<160*2;i++) {
+                outbytes[i]=0;
+              }
+              sourceDataLine.write(outbytes,0,160*2); 
+              sourceDataLine.start();
+            }
+
             Thread.sleep(0, 100);
           }
 
         } catch(Exception e) {
+          e.printStackTrace();
         }
       }
   }
@@ -87,10 +88,12 @@ SourceDataLine sourceDataLine;
   ///////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////
   public audio() {
-    format = new AudioFormat(7950, 16, 2, true, false); //last boolean is endian-type (false=little)
+    format = new AudioFormat(7900, 16, 2, true, false); //last boolean is endian-type (false=little)
+    inbytes = new byte[32768];
+    outbytes = new byte[32768];
     try {
       sourceDataLine = AudioSystem.getSourceDataLine( format);
-      sourceDataLine.open(format, 8000);
+      sourceDataLine.open(format, 640*4);
     } catch(Exception e) {
       e.printStackTrace();
     }
@@ -118,17 +121,9 @@ SourceDataLine sourceDataLine;
   ///////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////
   void play_audio(byte[] b, int len) {
-
-    while(do_new_audio==1);
-
-    if(inbytes==null || inbytes.length!=len) inbytes = new byte[len];
-    if(outbytes==null || outbytes.length!=len*4) outbytes = new byte[ len*4 ]; 
-
     for(int i=0;i<len;i++) {
-      inbytes[i] = b[i];
+      inbytes[out_e++] = b[i];
+      if(out_e==32768) out_e=0;
     }
-
-    audio_len = len;
-    do_new_audio=1;
   }
 }
