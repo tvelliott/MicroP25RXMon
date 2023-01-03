@@ -27,12 +27,15 @@ import processing.core.*;
 public class config_frame extends javax.swing.JFrame {
 
   MicroP25RXMon parent;
+  int total_bytes=0;
 
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
     public config_frame(MicroP25RXMon p) {
       initComponents();
       parent = p;
+      ta.setForeground( java.awt.Color.white );
+      ta.setBackground( java.awt.Color.black );
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -81,6 +84,8 @@ public class config_frame extends javax.swing.JFrame {
     public void addString(String str) {
       ta.append(str);
       ta.setCaretPosition( ta.getText().length() );
+      total_bytes += str.length();
+      //System.out.println("total: "+total_bytes);
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -88,6 +93,7 @@ public class config_frame extends javax.swing.JFrame {
     private void read_configActionPerformed(java.awt.event.ActionEvent evt) {
       System.out.println("read config");
       Serial serial = parent.getSerial();
+      total_bytes=0;
       if(serial!=null) {
         ta.removeAll();
         parent.serial.write( new String("send_config\r\n").getBytes() );
