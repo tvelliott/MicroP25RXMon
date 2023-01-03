@@ -21,13 +21,18 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+import processing.serial.*;
+import processing.core.*;
 
 public class config_frame extends javax.swing.JFrame {
 
+  MicroP25RXMon parent;
+
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
-    public config_frame() {
-        initComponents();
+    public config_frame(MicroP25RXMon p) {
+      initComponents();
+      parent = p;
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -81,6 +86,8 @@ public class config_frame extends javax.swing.JFrame {
     ///////////////////////////////////////////////////////////////////////
     private void read_configActionPerformed(java.awt.event.ActionEvent evt) {
       System.out.println("read config");
+      Serial serial = parent.getSerial();
+      if(serial!=null) parent.serial.write( new String("send_config\r\n").getBytes() );
     }
 
     ///////////////////////////////////////////////////////////////////////
