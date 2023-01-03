@@ -24,12 +24,14 @@
 
 public class config_frame extends javax.swing.JFrame {
 
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
     public config_frame() {
         initComponents();
     }
 
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
@@ -61,28 +63,32 @@ public class config_frame extends javax.swing.JFrame {
 
         ta.setColumns(20);
         ta.setRows(5);
-        ta.setFont(new java.awt.Font("FreeMono", 0, 18)); // NOI18N
+        ta.setFont(new java.awt.Font("FreeMono", 0, 18)); 
         jScrollPane1.setViewportView(ta);
 
         getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
-    private void read_configActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_read_configActionPerformed
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    private void read_configActionPerformed(java.awt.event.ActionEvent evt) {
       System.out.println("read config");
-    }//GEN-LAST:event_read_configActionPerformed
+    }
 
-    private void write_configActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_write_configActionPerformed
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    private void write_configActionPerformed(java.awt.event.ActionEvent evt) {
       System.out.println("write config");
-    }//GEN-LAST:event_write_configActionPerformed
+    }
 
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton read_config;
     private javax.swing.JTextArea ta;
     private javax.swing.JButton write_config;
-    // End of variables declaration//GEN-END:variables
 }
