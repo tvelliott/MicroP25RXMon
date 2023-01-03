@@ -80,6 +80,7 @@ public class config_frame extends javax.swing.JFrame {
     ///////////////////////////////////////////////////////////////////////
     public void addString(String str) {
       ta.append(str);
+      ta.setCaretPosition( ta.getText().length() );
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -87,7 +88,10 @@ public class config_frame extends javax.swing.JFrame {
     private void read_configActionPerformed(java.awt.event.ActionEvent evt) {
       System.out.println("read config");
       Serial serial = parent.getSerial();
-      if(serial!=null) parent.serial.write( new String("send_config\r\n").getBytes() );
+      if(serial!=null) {
+        ta.removeAll();
+        parent.serial.write( new String("send_config\r\n").getBytes() );
+      }
     }
 
     ///////////////////////////////////////////////////////////////////////
