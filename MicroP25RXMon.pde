@@ -296,6 +296,12 @@ void process_buffer(byte b) {
           serial_packet_count++;
           port_to=60;
         break;
+        case  6 :
+          //print( new String(buf,0,buf_len) );
+          config.addString( new String(buf,0,buf_len) );
+          serial_packet_count++;
+          port_to=60;
+        break;
         default :
           //do nothing, unknown port
         break;
