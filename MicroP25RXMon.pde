@@ -29,6 +29,7 @@ import java.nio.*;
 int have_gpu=1;
 int showText = 1;
 int do_meta_output=0;
+int do_draw_iq=0;
 
 //int serial_port = 0; //port is auto detected
 int serial_baud_rate = 480000000;
@@ -86,6 +87,12 @@ color col_def_const;
 String dmod = "";
 audio aud;
 
+int button_press=0;
+
+int did_draw_config=0;
+
+config_frame config=null;
+
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
 void setup()
@@ -105,6 +112,9 @@ void setup()
   println("-----------------------");
  
   aud = new audio();
+
+  config = new config_frame();
+  config.setSize(640,480);
 
 }
 ///////////////////////////////////////////////////////////////////////////////////
@@ -177,6 +187,21 @@ void draw()
    fill(0,0,0);
    rect(0,0,512,128); //blank to background
   }
+
+  if(mousePressed) {
+    //rect(25,475,105,25);
+    if(mouseX>25 && mouseY>475 && mouseX < 130 && mouseY<500) {
+      if(button_press==0) {
+        print("\r\nconfig button pressed"); 
+        button_press=1;
+        //call config here
+        config.setVisible(true);
+      }
+    }
+  }
+  else { 
+    button_press=0;
+  }
 } 
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -231,9 +256,12 @@ void process_buffer(byte b) {
 
       switch(port) {
         case  1 :
-          //if(have_gpu>0) draw_iq(buf,buf_len);
-          serial_packet_count++;
-          port_to=60;
+          if(have_gpu>0 && do_draw_iq>0) {
+            draw_iq(buf,buf_len);
+            serial_packet_count++;
+            port_to=60;
+            did_draw_config=0;
+          }
         break;
         case  2 :
           if(have_gpu>0) draw_audio(buf,buf_len);
@@ -250,6 +278,18 @@ void process_buffer(byte b) {
           if(have_gpu>0) draw_constellation(buf,buf_len);
           serial_packet_count++;
           port_to=60;
+          
+          if(did_draw_config==0) {
+            //draw config button
+            fill(col1);
+            stroke(col1);
+            rect(25,475,105,25);
+            fill(0,0,0);
+            stroke(0,0,0);
+            textSize(25);
+            text("CONFIG",35,495);  
+            did_draw_config=1;
+          }
         break;
         case  5 :
           handle_metainfo(buf,buf_len);
@@ -262,13 +302,16 @@ void process_buffer(byte b) {
       }
 
       rx_state=0; //get the next packet
+        
+
     }
   }
   else {
     //println("rx_state "+rx_state+" val "+val);
     rx_state=0;
   }
- 
+   
+
 }
 
 
@@ -294,6 +337,7 @@ void draw_audio(byte[] b, int len) {
 
   fill(col_def_const);
   stroke(col_def_const);
+  
  
   //draw the audio
  int step=2;
