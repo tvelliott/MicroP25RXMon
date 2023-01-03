@@ -172,7 +172,7 @@ void draw()
   
   aud.audio_tick();
   
-  if(aud.audio_tick_cnt==0) {
+  if(aud.audio_active==0) {
    stroke(0,0,0);
    fill(0,0,0);
    rect(0,0,512,128); //blank to background

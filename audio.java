@@ -28,8 +28,8 @@ class audio {
 
   java.util.Timer utimer;
   volatile int do_new_audio=0;
-  byte[] outbytes;
-  byte[] inbytes;
+  byte[] outbytes=null;
+  byte[] inbytes=null;
   int audio_len;
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,7 +46,6 @@ class audio {
               bb.order(ByteOrder.LITTLE_ENDIAN);
 
               int idx=0;
-              int idx2=0;
               for(int i=0;i<audio_len/2;i++) {
 
                 short val = bb.getShort(); 
@@ -58,27 +57,49 @@ class audio {
                 outbytes[idx+3] = outbytes[idx+1]; 
 
                 idx+=4;
-                idx2+=2;
               }
 
              
               sourceDataLine.write(outbytes,0,idx); 
-              //if(frame_cnt++%9==0 && !sourceDataLine.isRunning()) sourceDataLine.start();
-              if(audio_buf_cnt++>4) {
+
+              if(audio_tick_cnt<30) {
+                sourceDataLine.start(); 
                 audio_tick_cnt=30;
-                sourceDataLine.start();
               }
+              do_new_audio=0;
+              if(audio_active<30) audio_active++;
+            }
+            else if( sourceDataLine.available()>4000) {
+              int idx=0;
+              for(int i=0;i<320;i++) {
+
+                outbytes[idx+0] = 0; 
+                outbytes[idx+1] = 0; 
+
+                outbytes[idx+2] = outbytes[idx+0]; 
+                outbytes[idx+3] = outbytes[idx+1]; 
+
+                idx+=4;
+              }
+              sourceDataLine.write(outbytes,0,idx); 
+
+              sourceDataLine.start(); 
+              audio_tick_cnt=30;
+              if(audio_active>0) audio_active--;
+
             }
 
-            do_new_audio=0;
             Thread.sleep(0, 100);
+            //System.out.println("avail: "+sourceDataLine.available());
           }
 
         } catch(Exception e) {
+          e.printStackTrace();
         }
       }
   }
   
+public int audio_active=0;
 public int audio_tick_cnt=0;
 int audio_buf_cnt=0;
 AudioFormat format;
@@ -102,6 +123,8 @@ SourceDataLine sourceDataLine;
       e.printStackTrace();
     }
     
+    if(inbytes==null ) inbytes = new byte[320];
+    if(outbytes==null ) outbytes = new byte[ 320*4 ]; 
   }
     
   ///////////////////////////////////////////////////////////////////////////////////
@@ -110,10 +133,10 @@ SourceDataLine sourceDataLine;
     if(audio_tick_cnt>0) {
       audio_tick_cnt--;
       if(audio_tick_cnt==0) {
-        sourceDataLine.stop();
         audio_buf_cnt=0;
       }
     }
+    if(audio_buf_cnt==0 && sourceDataLine.available()==8000) sourceDataLine.stop();
   }
   ///////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////
