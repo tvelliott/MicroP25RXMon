@@ -583,9 +583,6 @@ void handle_metainfo(byte[] b, int len) {
   }
 
   byte do_wio_lines = bb3.get();
-  bb3.get();
-  bb3.get();
-  bb3.get();
 
   String wio_line1_str=null;
   byte[] wio_line1 = new byte[32];
@@ -593,7 +590,10 @@ void handle_metainfo(byte[] b, int len) {
     wio_line1[i] = bb3.get();
     if(wio_line1[i]==0 && wio_line1_str==null) wio_line1_str = new String(wio_line1);
   }
-
+  
+  bb3.get();
+  bb3.get();
+  
   String wio_line2_str=null;
   byte[] wio_line2 = new byte[64];
   for(int i=0;i<64;i++) {
@@ -601,6 +601,7 @@ void handle_metainfo(byte[] b, int len) {
     if(wio_line2[i]==0 && wio_line2_str==null) wio_line2_str = new String(wio_line2);
   }
 
+  bb3.get();
   int wio_timeout = bb3.getInt();
 
   byte tsbk_sec = bb3.get();
@@ -791,7 +792,9 @@ void handle_metainfo(byte[] b, int len) {
     rect(520, 450, 512, 50); // erase
     fill(col10);
     textSize(20);
-
+    if (wio_line1_str.trim() != "" || wio_line2_str.trim() != "") 
+    { text(wio_line1_str.trim(), 550, 460);
+    text(wio_line2_str.trim(), 550, 480);}
  } 
   
 } 
