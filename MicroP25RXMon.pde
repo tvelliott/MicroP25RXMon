@@ -278,6 +278,7 @@ void process_buffer(byte b) {
           print( new String(buf,0,buf_len) );
           serial_packet_count++;
           port_to=60;
+          did_draw_config=0;
         break;
         case  4 :
           if(have_gpu>0) draw_constellation(buf,buf_len);
