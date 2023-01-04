@@ -19,7 +19,7 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-
+int fw_ver = 2023010401;
 
 import processing.serial.*;
 import java.nio.*;
@@ -294,6 +294,14 @@ void process_buffer(byte b) {
             stroke(0,0,0);
             textSize(25);
             text("CONFIG",35,495);  
+            textSize(15);
+            
+            fill(0,0,0);
+            stroke(0,0,0);
+            rect(120,475,160,25);
+            fill(255,255,255);
+            stroke(255,255,255);
+            text("FW_VER "+fw_ver, 150,495);
             did_draw_config=1;
           }
         break;
