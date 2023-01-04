@@ -36,6 +36,11 @@ public class config_frame extends javax.swing.JFrame {
       parent = p;
       ta.setForeground( java.awt.Color.white );
       ta.setBackground( java.awt.Color.black );
+      try {
+        this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("data/console.png")).getImage()); 
+      } catch(Exception e) {
+        //e.printStackTrace();
+      }
     }
 
     ///////////////////////////////////////////////////////////////////////
