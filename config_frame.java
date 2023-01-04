@@ -23,11 +23,13 @@
 
 import processing.serial.*;
 import processing.core.*;
+import javax.swing.text.*; 
 
 public class config_frame extends javax.swing.JFrame {
 
   MicroP25RXMon parent;
   int total_bytes=0;
+  DefaultCaret caret;
 
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
@@ -36,6 +38,15 @@ public class config_frame extends javax.swing.JFrame {
       parent = p;
       ta.setForeground( java.awt.Color.white );
       ta.setBackground( java.awt.Color.black );
+
+      caret = (DefaultCaret) ta.getCaret();
+
+      caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+      ta.setCaretColor(java.awt.Color.white);
+      ta.getCaret().setVisible(true);
+      ta.getCaret().setBlinkRate(250);
+
+
       try {
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("data/console.png")).getImage()); 
       } catch(Exception e) {
@@ -90,6 +101,10 @@ public class config_frame extends javax.swing.JFrame {
       ta.append(str);
       ta.setCaretPosition( ta.getText().length() );
       total_bytes += str.length();
+      caret.setDot(total_bytes);
+      ta.setCaretColor(java.awt.Color.white);
+      ta.getCaret().setVisible(true);
+      ta.getCaret().setBlinkRate(250);
       //System.out.println("total: "+total_bytes);
     }
 
