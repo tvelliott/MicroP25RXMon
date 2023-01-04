@@ -76,7 +76,7 @@ public class config_frame extends javax.swing.JFrame {
 
         ta.setColumns(20);
         ta.setRows(5);
-        ta.setFont(new java.awt.Font("FreeMono", 0, 24)); 
+        ta.setFont(new java.awt.Font("FreeMono", 0, 18)); 
         jScrollPane1.setViewportView(ta);
 
         getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
