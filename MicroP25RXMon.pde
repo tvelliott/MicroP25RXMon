@@ -19,7 +19,7 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-int fw_ver = 2023010401;
+int fw_ver = 2023010402;
 
 import processing.serial.*;
 import java.nio.*;
@@ -159,7 +159,7 @@ void draw()
 
       try {
         serial = new Serial(this, port_name, serial_baud_rate);
-        port_to=60;
+        port_to=300;
         found_port=0;
       } catch(Exception e) {
         e.printStackTrace();
@@ -264,7 +264,7 @@ void process_buffer(byte b) {
           if(have_gpu>0 && do_draw_iq>0) {
             draw_iq(buf,buf_len);
             serial_packet_count++;
-            port_to=60;
+            port_to=300;
             did_draw_config=0;
           }
         break;
@@ -272,18 +272,18 @@ void process_buffer(byte b) {
           if(have_gpu>0) draw_audio(buf,buf_len);
           aud.play_audio(buf,buf_len);
           serial_packet_count++;
-          port_to=60;
+          port_to=300;
         break;
         case  3 :
           print( new String(buf,0,buf_len) );
           serial_packet_count++;
-          port_to=60;
+          port_to=300;
           did_draw_config=0;
         break;
         case  4 :
           if(have_gpu>0) draw_constellation(buf,buf_len);
           serial_packet_count++;
-          port_to=60;
+          port_to=300;
           
           if(did_draw_config==0) {
             //draw config button
@@ -308,13 +308,13 @@ void process_buffer(byte b) {
         case  5 :
           handle_metainfo(buf,buf_len);
           serial_packet_count++;
-          port_to=60;
+          port_to=300;
         break;
         case  6 :
           //print( new String(buf,0,buf_len) );
           config.addString( new String(buf,0,buf_len) );
           serial_packet_count++;
-          port_to=60;
+          port_to=300;
         break;
         default :
           //do nothing, unknown port
