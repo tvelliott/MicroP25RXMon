@@ -100,7 +100,7 @@ public class config_frame extends javax.swing.JFrame {
       Serial serial = parent.getSerial();
       total_bytes=0;
       if(serial!=null) {
-        ta.removeAll();
+        ta.setText("");
         parent.serial.write( new String("send_config\r\n").getBytes() );
       }
     }
