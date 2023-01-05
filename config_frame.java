@@ -111,8 +111,12 @@ public class config_frame extends javax.swing.JFrame {
     }
 
     ///////////////////////////////////////////////////////////////////////
+    // port1 :  \n-terminated command string
     ///////////////////////////////////////////////////////////////////////
-    private void write_bytes( byte[] b, int port, int len) {
+    private void send_frame( byte[] b, int port) {
+
+      int len = b.length;
+
       Serial serial = parent.getSerial();
       if(serial==null) return;
 
@@ -122,17 +126,17 @@ public class config_frame extends javax.swing.JFrame {
       serial_buffer = new byte[ len + 8];
 
       //add sync word
-      serial_buffer[0]=(byte) 0xf7;
-      serial_buffer[1]=(byte) 0xc5;
-      serial_buffer[2]=(byte) 0x17;
-      serial_buffer[3]=(byte) 0x29;
-      serial_buffer[4]=(byte) 0x41;
+      serial_buffer[0]=(byte) 0xf7; //sync1
+      serial_buffer[1]=(byte) 0xc5; //sync2
+      serial_buffer[2]=(byte) 0x17; //sync3
+      serial_buffer[3]=(byte) 0x29; //sync4
+      serial_buffer[4]=(byte) 0x41; //sync5
       serial_buffer[5]= (byte) (port&0xff);   //PORT
-      serial_buffer[6]= (byte) ((len>>8)&0xff); 
+      serial_buffer[6]= (byte) ((len>>8)&0xff); //frame len (16-bit)
       serial_buffer[7]= (byte) (len&0xff); 
 
       for(int i=0;i<len;i++) {
-        serial_buffer[8+i] = b[i];
+        serial_buffer[8+i] = b[i]; //frame data
       }
 
       if(len > 0) {
@@ -148,15 +152,15 @@ public class config_frame extends javax.swing.JFrame {
 
       ta.setText(""); //clear all text
 
-      //send command to receiver
-      String cmd = "send_config\r\n"; //send_config causes the receiver to send BACKUP ini config information to port 6
-      write_bytes( cmd.getBytes(), 1, cmd.length() );   //port 1 is a \n-terminated command string
+      //send_config causes the receiver to send BACKUP ini config information to port 6
+      send_frame( new String("send_config\r\n").getBytes(), 1);   //port 1 is a \n-terminated command string
     }
 
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
     private void write_configActionPerformed(java.awt.event.ActionEvent evt) {
       System.out.println("write config");
+
     }
 
 
