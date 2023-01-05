@@ -93,6 +93,10 @@ int did_draw_config=0;
 
 config_frame config=null;
 
+int out_of_seq;
+int prev_packet_id;
+int packet_id;
+
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
 void setup()
@@ -250,11 +254,36 @@ void process_buffer(byte b) {
     rx_state++;
   } else if( rx_state == 7 ) { //get lower 8bits len
     buf_len |= (int) ((int) val);
- 
     if(buf_len > 2048) rx_state=0;
       else rx_state++;
   }
-  else if(rx_state==8) {      //start collection len bytes
+  else if( rx_state == 8 ) { 
+    packet_id = (int) ((int) val<<24);
+    rx_state++;
+  }
+  else if( rx_state == 9 ) { 
+    packet_id |= (int) ((int) val<<16);
+    rx_state++;
+  }
+  else if( rx_state == 10 ) { 
+    packet_id |= (int) ((int) val<<8);
+    rx_state++;
+  }
+  else if( rx_state == 11 ) { 
+    packet_id |= (int) ((int) val);
+    rx_state++;
+
+    if( packet_id==0 ) {
+      prev_packet_id=0;
+      out_of_seq=0;
+    }
+    else if(packet_id!=prev_packet_id+1) {
+      print("\r\ndetected out of sequence packet_id");
+      out_of_seq++;
+    }
+    prev_packet_id=packet_id;
+  }
+  else if(rx_state==12) {      //start collection len bytes
     buf[buf_idx++]=(byte) val;;
 
     if(buf_idx == buf_len) {    //handle data
@@ -315,6 +344,11 @@ void process_buffer(byte b) {
           config.addString( new String(buf,0,buf_len) );
           serial_packet_count++;
           port_to=300;
+          if(buf_len<512) {
+            print("\r\nlast packet received");
+            if( out_of_seq>0) print( String.format("\r\n%d out of seq packets detected", out_of_seq) );
+            else if( out_of_seq==0) print( String.format("\r\nno errors detected", out_of_seq) );
+          }
         break;
         default :
           //do nothing, unknown port
