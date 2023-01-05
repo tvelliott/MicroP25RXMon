@@ -32,6 +32,7 @@ public class config_frame extends javax.swing.JFrame {
   DefaultCaret caret;
 
   byte[] serial_buffer = new byte[2048];
+  int packet_id=0;
 
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
@@ -113,7 +114,7 @@ public class config_frame extends javax.swing.JFrame {
     ///////////////////////////////////////////////////////////////////////
     // port1 :  \n-terminated command string
     ///////////////////////////////////////////////////////////////////////
-    private void send_frame( byte[] b, int port) {
+    private void send_frame( byte[] b, int port, int tx_packet_id) {
 
       int len = b.length;
 
@@ -123,7 +124,7 @@ public class config_frame extends javax.swing.JFrame {
       if(len > 2040) len=2040;
       if(len < 0) return; 
 
-      serial_buffer = new byte[ len + 8];
+      serial_buffer = new byte[ len + 12];
 
       //add sync word
       serial_buffer[0]=(byte) 0xf7; //sync1
@@ -134,9 +135,13 @@ public class config_frame extends javax.swing.JFrame {
       serial_buffer[5]= (byte) (port&0xff);   //PORT
       serial_buffer[6]= (byte) ((len>>8)&0xff); //frame len (16-bit)
       serial_buffer[7]= (byte) (len&0xff); 
+      serial_buffer[8]= (byte) ((tx_packet_id>>24)&0xff);   //32-bit packet_id
+      serial_buffer[9]= (byte) ((tx_packet_id>>16)&0xff);   
+      serial_buffer[10]= (byte) ((tx_packet_id>>8)&0xff);   
+      serial_buffer[11]= (byte) (tx_packet_id&0xff);   
 
       for(int i=0;i<len;i++) {
-        serial_buffer[8+i] = b[i]; //frame data
+        serial_buffer[12+i] = b[i]; //frame data
       }
 
       if(len > 0) {
@@ -153,7 +158,8 @@ public class config_frame extends javax.swing.JFrame {
       ta.setText(""); //clear all text
 
       //send_config causes the receiver to send BACKUP ini config information to port 6
-      send_frame( new String("send_config\r\n").getBytes(), 1);   //port 1 is a \n-terminated command string
+      packet_id=0; //increment this on ack for >1 frames 
+      send_frame( new String("send_config\r\n").getBytes(), 1, packet_id);   //port 1 is a \n-terminated command string
     }
 
     ///////////////////////////////////////////////////////////////////////
