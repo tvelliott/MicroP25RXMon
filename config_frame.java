@@ -35,6 +35,7 @@ public class config_frame extends javax.swing.JFrame {
   private int packet_id=0;
 
   byte[] data_frame;
+  int bytes_to_send;
   int data_frame_len;
   int data_frame_off;
 
@@ -174,6 +175,7 @@ public class config_frame extends javax.swing.JFrame {
       try {
         data_frame = ta.getText().getBytes();
         data_frame_len = data_frame.length; 
+        bytes_to_send=data_frame_len;
         packet_id=0;
         data_frame_off=0;
 
@@ -210,7 +212,14 @@ public class config_frame extends javax.swing.JFrame {
         parent.print(" wrote "+(tot+data_frame_off)+" bytes");
 
 
-        if(data_frame_len>0) send_frame( data_frame, send_len, data_frame_off, 2, packet_id);   //send next write to mem frame
+        if(data_frame_len>0) {
+          send_frame( data_frame, send_len, data_frame_off, 2, packet_id);   //send next write to mem frame
+        }
+        else {
+          if( (tot + data_frame_off) == bytes_to_send ) {
+            parent.print("\r\nsent configuration ok");
+          }
+        }
       }
     }
 
