@@ -19,7 +19,7 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-int fw_ver = 2023010402;
+int fw_ver = 2023010501;
 
 import processing.serial.*;
 import java.nio.*;
@@ -93,9 +93,9 @@ int did_draw_config=0;
 
 config_frame config=null;
 
-int out_of_seq;
-int prev_packet_id;
-int packet_id;
+private volatile int out_of_seq;
+private volatile int prev_packet_id;
+private volatile int packet_id;
 
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
@@ -103,7 +103,7 @@ void setup()
 {
   size(1024, 512);
   background(0); //black
-  buf = new byte[2048];
+  buf = new byte[4096];
   buf_idx=0;
 
   iq_samples = new float[1024];
@@ -274,19 +274,19 @@ void process_buffer(byte b) {
     rx_state++;
 
     if( packet_id==0 ) {
-      prev_packet_id=0;
       out_of_seq=0;
     }
-    else if(packet_id!=prev_packet_id+1) {
-      print("\r\ndetected out of sequence packet_id");
+    else if(port==6 && packet_id!=prev_packet_id+1) {
+      print("\r\ndetected out of sequence packet_id "+packet_id+" "+prev_packet_id+1);
       out_of_seq++;
     }
     prev_packet_id=packet_id;
   }
   else if(rx_state==12) {      //start collection len bytes
+
     buf[buf_idx++]=(byte) val;;
 
-    if(buf_idx == buf_len) {    //handle data
+    if(buf_len==0  || buf_idx == buf_len) {    //handle data
 
       switch(port) {
         case  1 :
@@ -343,13 +343,22 @@ void process_buffer(byte b) {
           //print( new String(buf,0,buf_len) );
           config.addString( new String(buf,0,buf_len) );
           serial_packet_count++;
-          port_to=300;
+          port_to=1200;
           if(buf_len<512) {
             print("\r\nlast packet received");
             if( out_of_seq>0) print( String.format("\r\n%d out of seq packets detected", out_of_seq) );
             else if( out_of_seq==0) print( String.format("\r\nno errors detected", out_of_seq) );
           }
         break;
+
+        case  7 :
+          if( buf_len==0 ) {  //ACK has no data
+            print("\r\nACK "+packet_id);
+            config.rx_ack(packet_id);
+          }
+        break;
+
+
         default :
           //do nothing, unknown port
         break;

@@ -32,7 +32,11 @@ public class config_frame extends javax.swing.JFrame {
   DefaultCaret caret;
 
   byte[] serial_buffer = new byte[2048];
-  int packet_id=0;
+  private int packet_id=0;
+
+  byte[] data_frame;
+  int data_frame_len;
+  int data_frame_off;
 
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
@@ -114,9 +118,7 @@ public class config_frame extends javax.swing.JFrame {
     ///////////////////////////////////////////////////////////////////////
     // port1 :  \n-terminated command string
     ///////////////////////////////////////////////////////////////////////
-    private void send_frame( byte[] b, int port, int tx_packet_id) {
-
-      int len = b.length;
+    private void send_frame( byte[] b, int len, int off, int port, int tx_packet_id) {
 
       Serial serial = parent.getSerial();
       if(serial==null) return;
@@ -141,7 +143,7 @@ public class config_frame extends javax.swing.JFrame {
       serial_buffer[11]= (byte) (tx_packet_id&0xff);   
 
       for(int i=0;i<len;i++) {
-        serial_buffer[12+i] = b[i]; //frame data
+        serial_buffer[12+i] = b[i+off]; //frame data
       }
 
       if(len > 0) {
@@ -154,12 +156,14 @@ public class config_frame extends javax.swing.JFrame {
     private void read_configActionPerformed(java.awt.event.ActionEvent evt) {
       System.out.println("read config");
       total_bytes=0;
+      data_frame_off=0;
 
       ta.setText(""); //clear all text
 
       //send_config causes the receiver to send BACKUP ini config information to port 6
       packet_id=0; //increment this on ack for >1 frames 
-      send_frame( new String("send_config\r\n").getBytes(), 1, packet_id);   //port 1 is a \n-terminated command string
+      byte[] b = new String("send_config\r\n").getBytes();
+      send_frame( b, b.length, 0, 1, packet_id);   //port 1 is a \n-terminated command string
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -167,6 +171,37 @@ public class config_frame extends javax.swing.JFrame {
     private void write_configActionPerformed(java.awt.event.ActionEvent evt) {
       System.out.println("write config");
 
+      try {
+        data_frame = ta.getText().getBytes();
+        data_frame_len = data_frame.length; 
+        packet_id=0;
+        data_frame_off=0;
+
+        int send_len = data_frame_len;
+        if(send_len>512) send_len=512;
+
+        send_frame( data_frame, send_len, data_frame_off, 2, packet_id);   //port 2 is write to mem 
+      } catch(Exception e) {
+        e.printStackTrace();
+      }
+    }
+
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    void rx_ack(int rxid) {
+      if(packet_id==rxid) {
+        packet_id++;
+
+        if(data_frame_len>512) data_frame_len-=512;
+        else if(data_frame_len>0) data_frame_len=0;
+
+        int send_len = data_frame_len;
+        if(send_len>512) send_len=512;
+
+        if(data_frame_len>0) data_frame_off+=512;
+
+        if(data_frame_len>0) send_frame( data_frame, send_len, data_frame_off, 2, packet_id);   //send next write to mem frame
+      }
     }
 
 
