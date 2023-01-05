@@ -112,7 +112,7 @@ public class config_frame extends javax.swing.JFrame {
       ta.setCaretColor(java.awt.Color.white);
       ta.getCaret().setVisible(true);
       ta.getCaret().setBlinkRate(250);
-      //System.out.println("total: "+total_bytes);
+      System.out.println("read: "+total_bytes+" bytes");
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -192,13 +192,23 @@ public class config_frame extends javax.swing.JFrame {
       if(packet_id==rxid) {
         packet_id++;
 
-        if(data_frame_len>512) data_frame_len-=512;
-        else if(data_frame_len>0) data_frame_len=0;
+        int tot = data_frame_len;
+
+        if(data_frame_len>512) {
+          data_frame_len-=512;
+          tot=0;
+        }
+        else if(data_frame_len>0) {
+          data_frame_len=0;
+        }
 
         int send_len = data_frame_len;
         if(send_len>512) send_len=512;
 
         if(data_frame_len>0) data_frame_off+=512;
+
+        parent.print(" wrote "+(tot+data_frame_off)+" bytes");
+
 
         if(data_frame_len>0) send_frame( data_frame, send_len, data_frame_off, 2, packet_id);   //send next write to mem frame
       }
