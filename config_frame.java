@@ -31,6 +31,8 @@ public class config_frame extends javax.swing.JFrame {
   int total_bytes=0;
   DefaultCaret caret;
 
+  byte[] serial_buffer = new byte[2048];
+
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
     public config_frame(MicroP25RXMon p) {
@@ -110,14 +112,45 @@ public class config_frame extends javax.swing.JFrame {
 
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
+    private void write_bytes( byte[] b, int port, int len) {
+      Serial serial = parent.getSerial();
+      if(serial==null) return;
+
+      if(len > 2040) len=2040;
+      if(len < 0) return; 
+
+      serial_buffer = new byte[ len + 8];
+
+      //add sync word
+      serial_buffer[0]=(byte) 0xf7;
+      serial_buffer[1]=(byte) 0xc5;
+      serial_buffer[2]=(byte) 0x17;
+      serial_buffer[3]=(byte) 0x29;
+      serial_buffer[4]=(byte) 0x41;
+      serial_buffer[5]= (byte) (port&0xff);   //PORT
+      serial_buffer[6]= (byte) ((len>>8)&0xff); 
+      serial_buffer[7]= (byte) (len&0xff); 
+
+      for(int i=0;i<len;i++) {
+        serial_buffer[8+i] = b[i];
+      }
+
+      if(len > 0) {
+        parent.serial.write(serial_buffer);
+      }
+    }
+
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
     private void read_configActionPerformed(java.awt.event.ActionEvent evt) {
       System.out.println("read config");
-      Serial serial = parent.getSerial();
       total_bytes=0;
-      if(serial!=null) {
-        ta.setText("");
-        parent.serial.write( new String("send_config\r\n").getBytes() );
-      }
+
+      ta.setText(""); //clear all text
+
+      //send command to receiver
+      String cmd = "send_config\r\n"; //send_config causes the receiver to send BACKUP ini config information to port 6
+      write_bytes( cmd.getBytes(), 1, cmd.length() );   //port 1 is a \n-terminated command string
     }
 
     ///////////////////////////////////////////////////////////////////////
