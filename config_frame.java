@@ -66,14 +66,39 @@ public class config_frame extends javax.swing.JFrame {
     ///////////////////////////////////////////////////////////////////////
     private void initComponents() {
 
+        jScrollPane1 = new javax.swing.JScrollPane();
+        ta = new javax.swing.JTextArea();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        status = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         read_config = new javax.swing.JButton();
         write_config = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        ta = new javax.swing.JTextArea();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        loadfile = new javax.swing.JMenuItem();
+        savefile = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
 
-        setTitle("MicroP25RXMon Config");
-        setBounds(new java.awt.Rectangle(0, 0, 640, 480));
+        setTitle("MicroP25RXMon");
+
+        ta.setBackground(new java.awt.Color(0, 0, 0));
+        ta.setColumns(20);
+        ta.setFont(new java.awt.Font("FreeMono", 0, 18)); // NOI18N
+        ta.setForeground(new java.awt.Color(255, 255, 255));
+        ta.setRows(5);
+        jScrollPane1.setViewportView(ta);
+
+        getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        jPanel2.setLayout(new javax.swing.BoxLayout(jPanel2, javax.swing.BoxLayout.Y_AXIS));
+
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        status.setText("STATUS:");
+        jPanel3.add(status);
+
+        jPanel2.add(jPanel3);
 
         read_config.setText("Read Config");
         read_config.addActionListener(new java.awt.event.ActionListener() {
@@ -91,14 +116,36 @@ public class config_frame extends javax.swing.JFrame {
         });
         jPanel1.add(write_config);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
+        jPanel2.add(jPanel1);
 
-        ta.setColumns(20);
-        ta.setRows(5);
-        ta.setFont(new java.awt.Font("FreeMono", 0, 18)); 
-        jScrollPane1.setViewportView(ta);
+        getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
 
-        getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jMenu1.setText("File");
+
+        loadfile.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_L, java.awt.event.InputEvent.ALT_MASK));
+        loadfile.setText("Load Config File");
+        loadfile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadfileActionPerformed(evt);
+            }
+        });
+        jMenu1.add(loadfile);
+
+        savefile.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.ALT_MASK));
+        savefile.setText("Save Config File");
+        savefile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                savefileActionPerformed(evt);
+            }
+        });
+        jMenu1.add(savefile);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Edit");
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);
 
         pack();
     }
@@ -113,7 +160,10 @@ public class config_frame extends javax.swing.JFrame {
       ta.setCaretColor(java.awt.Color.white);
       ta.getCaret().setVisible(true);
       ta.getCaret().setBlinkRate(250);
-      System.out.println("read: "+total_bytes+" bytes");
+
+      String s = "read: "+total_bytes+" bytes";
+      System.out.println(s);
+      setStatus(s);
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -209,7 +259,11 @@ public class config_frame extends javax.swing.JFrame {
 
         if(data_frame_len>0) data_frame_off+=512;
 
-        parent.print(" wrote "+(tot+data_frame_off)+" bytes");
+
+        String str = " wrote "+(tot+data_frame_off)+" bytes";
+        parent.print(str);
+
+        setStatus(str);
 
 
         if(data_frame_len>0) {
@@ -223,12 +277,35 @@ public class config_frame extends javax.swing.JFrame {
       }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    public void setStatus(String s) {
+        status.setText("STATUS: "+s);
+    }
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    private void savefileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savefileActionPerformed
+    }//GEN-LAST:event_savefileActionPerformed
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
+    private void loadfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadfileActionPerformed
+    }//GEN-LAST:event_loadfileActionPerformed
 
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
+
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JMenuItem loadfile;
     private javax.swing.JButton read_config;
+    private javax.swing.JMenuItem savefile;
+    private javax.swing.JLabel status;
     private javax.swing.JTextArea ta;
     private javax.swing.JButton write_config;
 }

@@ -357,13 +357,6 @@ void process_buffer(byte b) {
             print("\r\nACK "+packet_id);
             config.rx_ack(packet_id);
             port_to=150;
-            fill(0,0,0);
-            stroke(0,0,0);
-            rect(300,475,160,25);
-            fill(255,255,255);
-            stroke(255,255,255);
-            textSize(12);
-            text("ACK "+packet_id, 300,495);
           }
         break;
 
