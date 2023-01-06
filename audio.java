@@ -32,6 +32,8 @@ class audio {
   byte[] inbytes=null;
   int audio_len;
 
+  final int BUFFER_LEN = 12000; //good values are between 8000 and 12000
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   class audio_thread extends java.util.TimerTask {
@@ -69,7 +71,7 @@ class audio {
               do_new_audio=0;
               if(audio_active<30) audio_active++;
             }
-            else if( sourceDataLine.available()>4000) {
+            else if( sourceDataLine.available()>BUFFER_LEN/2) {
               int idx=0;
               for(int i=0;i<320;i++) {
 
@@ -111,7 +113,7 @@ SourceDataLine sourceDataLine;
     format = new AudioFormat(7950, 16, 2, true, false); //last boolean is endian-type (false=little)
     try {
       sourceDataLine = AudioSystem.getSourceDataLine( format);
-      sourceDataLine.open(format, 8000);
+      sourceDataLine.open(format, BUFFER_LEN);
     } catch(Exception e) {
       e.printStackTrace();
     }
@@ -136,7 +138,7 @@ SourceDataLine sourceDataLine;
         audio_buf_cnt=0;
       }
     }
-    if(audio_buf_cnt==0 && sourceDataLine.available()==8000) sourceDataLine.stop();
+    if(audio_buf_cnt==0 && sourceDataLine.available()==BUFFER_LEN) sourceDataLine.stop();
   }
   ///////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////
