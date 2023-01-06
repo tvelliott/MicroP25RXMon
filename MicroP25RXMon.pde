@@ -19,7 +19,7 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-int fw_ver = 2023010601;
+int fw_ver = 2023010602;
 
 import processing.serial.*;
 import java.nio.*;
@@ -30,6 +30,7 @@ int have_gpu=1;
 int showText = 1;
 int do_meta_output=0;
 int do_draw_iq=0;
+int showTG_history=1;
 
 //int serial_port = 0; //port is auto detected
 int serial_baud_rate = 480000000;
@@ -97,6 +98,13 @@ private volatile int out_of_seq;
 private volatile int prev_packet_id;
 private volatile int packet_id;
 
+String TG1="";
+String TG2="";
+String TG3="";
+String TG4="";
+String TG5="";
+String TG_old="";
+String TG_active="";
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
 void setup()
@@ -777,16 +785,30 @@ void handle_metainfo(byte[] b, int len) {
     textSize(30);
 
     //Line 1
-    fill(0,0,0);
-    rect(520, 0, 512, 50); // erase
-    fill(col1);
-    text(sysname_str.trim()+" / "+site_name_str.trim(),550,40);
-
+    
+    if (wio_line1_str.trim() != "" || wio_line2_str.trim() != "") 
+    { textSize(20);
+      fill(0,0,0);
+      rect(520, 0, 512, 50); // erase
+      fill(col1);
+      text(wio_line1_str.trim(), 550, 20);
+      text(wio_line2_str.trim(), 550, 40);
+      fill(0,0,0);
+       textSize(30);
+    }
+    else if (wio_line1_str.trim() == "" || wio_line2_str.trim() == "") 
+    { fill(0,0,0);
+     rect(520, 0, 512, 50); // erase
+     fill(col1);
+     text(sysname_str.trim()+" / "+site_name_str.trim(),550,40);
+   }
+   
     //Line2
-    fill(0,0,0); //color
+   fill(0,0,0); //color
     rect(520, 50, 512, 50); // erase
     if (tg_s >0) { fill(col2); // color
-       text(tg_s +"  "+desc_str.trim(),550,90); }
+       text(tg_s +"  "+desc_str.trim(),550,90);
+       TG_active = (loc_str.trim()+"    "+tg_s); }
        
     //Line3
     fill(0,0,0); //color
@@ -836,21 +858,36 @@ void handle_metainfo(byte[] b, int len) {
     text("RID: "+RID+" , "+alias_str.trim(),550,390); };
 
     //Line9
-    fill(0,0,0); //color
-    rect(520, 400, 512, 50); // erase
-    fill(col9);
-    textSize(20);
-
-    //Line10
-    fill(0,0,0); //color
-    rect(520, 450, 512, 50); // erase
-    fill(col10);
-    textSize(20);
-    if (wio_line1_str.trim() != "" || wio_line2_str.trim() != "") 
-    { text(wio_line1_str.trim(), 550, 460);
-    text(wio_line2_str.trim(), 550, 480);}
- } 
+    if (showTG_history == 1) {
+      if (TG_old != TG_active) {
   
+         if (tg_s == 0) {    
+        
+           fill(0,0,0); //color
+           rect(520, 400, 512, 50); // erase
+           fill(col5); // col5 matches Wio TG history
+           textSize(20);
+              TG5 = TG4;
+              TG4 = TG3;
+              TG3 = TG2;
+              TG2 = TG1; 
+           text(TG_active, 550,420);  
+           text(TG2,550,440);
+    
+    //Line10
+           fill(0,0,0); //color
+           rect(520, 450, 512, 70); // erase
+           fill(col5); // col5 matches Wio TG history
+           textSize(20);     
+           text(TG3, 550, 460);
+           text(TG4, 550, 480);
+           text(TG5, 550, 500);
+           TG1 = TG_active;
+           TG_old = TG_active;  
+        }
+      }
+    } 
+  } 
 } 
 /////////////////////////////////////////////////////
 /////////////////////////////////////////////////////
