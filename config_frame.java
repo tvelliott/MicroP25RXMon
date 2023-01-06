@@ -24,6 +24,11 @@
 import processing.serial.*;
 import processing.core.*;
 import javax.swing.text.*; 
+import javax.swing.*; 
+import java.io.File; 
+import java.io.InputStream; 
+import java.io.BufferedReader; 
+import java.io.OutputStream; 
 
 public class config_frame extends javax.swing.JFrame {
 
@@ -39,6 +44,8 @@ public class config_frame extends javax.swing.JFrame {
   int data_frame_len;
   int data_frame_off;
 
+  final JFileChooser fc;
+
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
     public config_frame(MicroP25RXMon p) {
@@ -46,6 +53,8 @@ public class config_frame extends javax.swing.JFrame {
       parent = p;
       ta.setForeground( java.awt.Color.white );
       ta.setBackground( java.awt.Color.black );
+
+      fc = new JFileChooser();
 
       caret = (DefaultCaret) ta.getCaret();
 
@@ -285,11 +294,37 @@ public class config_frame extends javax.swing.JFrame {
     ///////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////
     private void savefileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savefileActionPerformed
+      int returnVal = fc.showDialog(this,"SAVE");
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+        try {
+          File file = fc.getSelectedFile();
+          java.io.RandomAccessFile raf = new java.io.RandomAccessFile(file, "rw");
+          raf.writeBytes(ta.getText());
+          raf.close();
+        } catch(Exception e) {
+          e.printStackTrace();
+        }
+
+      }
     }//GEN-LAST:event_savefileActionPerformed
 
     ///////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////
     private void loadfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadfileActionPerformed
+      int returnVal = fc.showDialog(this,"LOAD");
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+        try {
+          File file = fc.getSelectedFile();
+          java.io.RandomAccessFile raf = new java.io.RandomAccessFile(file, "r");
+          byte[] b = new byte[(int) file.length()];
+          raf.readFully(b);
+          ta.setText( new String(b) );
+          raf.close();
+        } catch(Exception e) {
+          e.printStackTrace();
+        }
+
+      }
     }//GEN-LAST:event_loadfileActionPerformed
 
     ///////////////////////////////////////////////////////////////////////
