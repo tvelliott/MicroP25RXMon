@@ -109,7 +109,7 @@ public class config_frame extends javax.swing.JFrame {
 
         jPanel2.add(jPanel3);
 
-        read_config.setText("Read Config");
+        read_config.setText("Read Config From Device");
         read_config.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 read_configActionPerformed(evt);
@@ -117,7 +117,7 @@ public class config_frame extends javax.swing.JFrame {
         });
         jPanel1.add(read_config);
 
-        write_config.setText("Write Config");
+        write_config.setText("Write Config To Device");
         write_config.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 write_configActionPerformed(evt);
