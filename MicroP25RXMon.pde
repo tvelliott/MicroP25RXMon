@@ -231,6 +231,7 @@ void process_buffer(byte b) {
   else if( rx_state == 1 && val == 0xc5 ) { //sync word
     rx_state++;
     
+    port_to=300;
   }
   else if( rx_state == 2 && val == 0x17 ) { //sync word
     rx_state++;
@@ -355,6 +356,7 @@ void process_buffer(byte b) {
           if( buf_len==0 ) {  //ACK has no data
             print("\r\nACK "+packet_id);
             config.rx_ack(packet_id);
+            port_to=1200;
           }
         break;
 
