@@ -19,7 +19,7 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-int fw_ver = 2023010502;
+int fw_ver = 2023010503;
 
 import processing.serial.*;
 import java.nio.*;
@@ -163,7 +163,7 @@ void draw()
 
       try {
         serial = new Serial(this, port_name, serial_baud_rate);
-        port_to=300;
+        port_to=150;
         found_port=0;
       } catch(Exception e) {
         e.printStackTrace();
@@ -231,7 +231,7 @@ void process_buffer(byte b) {
   else if( rx_state == 1 && val == 0xc5 ) { //sync word
     rx_state++;
     
-    port_to=300;
+    port_to=150;
   }
   else if( rx_state == 2 && val == 0x17 ) { //sync word
     rx_state++;
@@ -294,7 +294,7 @@ void process_buffer(byte b) {
           if(have_gpu>0 && do_draw_iq>0) {
             draw_iq(buf,buf_len);
             serial_packet_count++;
-            port_to=300;
+            port_to=150;
             did_draw_config=0;
           }
         break;
@@ -302,18 +302,18 @@ void process_buffer(byte b) {
           if(have_gpu>0) draw_audio(buf,buf_len);
           aud.play_audio(buf,buf_len);
           serial_packet_count++;
-          port_to=300;
+          port_to=150;
         break;
         case  3 :
           print( new String(buf,0,buf_len) );
           serial_packet_count++;
-          port_to=300;
+          port_to=150;
           did_draw_config=0;
         break;
         case  4 :
           if(have_gpu>0) draw_constellation(buf,buf_len);
           serial_packet_count++;
-          port_to=300;
+          port_to=150;
           
           if(did_draw_config==0) {
             //draw config button
@@ -338,13 +338,13 @@ void process_buffer(byte b) {
         case  5 :
           handle_metainfo(buf,buf_len);
           serial_packet_count++;
-          port_to=300;
+          port_to=150;
         break;
         case  6 :
           //print( new String(buf,0,buf_len) );
           config.addString( new String(buf,0,buf_len) );
           serial_packet_count++;
-          port_to=1200;
+          port_to=150;
           if(buf_len<512) {
             print("\r\nlast packet received");
             if( out_of_seq>0) print( String.format("\r\n%d out of seq packets detected", out_of_seq) );
@@ -356,7 +356,14 @@ void process_buffer(byte b) {
           if( buf_len==0 ) {  //ACK has no data
             print("\r\nACK "+packet_id);
             config.rx_ack(packet_id);
-            port_to=1200;
+            port_to=150;
+            fill(0,0,0);
+            stroke(0,0,0);
+            rect(300,475,160,25);
+            fill(255,255,255);
+            stroke(255,255,255);
+            textSize(12);
+            text("ACK "+packet_id, 300,495);
           }
         break;
 
