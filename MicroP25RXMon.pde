@@ -19,7 +19,7 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-int app_ver = 2023010702;
+int app_ver = 2023010703;
 
 import processing.serial.*;
 import java.nio.*;
@@ -795,9 +795,13 @@ void handle_metainfo(byte[] b, int len) {
     noStroke();
     textSize(30);
 
-    //Line 1
-    
-    if (wio_line1_str.trim() != "" || wio_line2_str.trim() != "") 
+      //Line 1
+    if (follow >0) { fill(0,0,0); //color
+         rect(520, 0, 512, 50); // erase
+         fill(col1);
+         text("HOLDING ON TG "+follow,550,40);
+     }
+    else if (wio_line1_str.trim() != "" || wio_line2_str.trim() != "") 
     { textSize(20);
       fill(0,0,0);
       rect(520, 0, 512, 50); // erase
@@ -806,12 +810,6 @@ void handle_metainfo(byte[] b, int len) {
       text(wio_line2_str.trim(), 550, 40);
       fill(0,0,0);
        textSize(30);
-      if(wio_line2_str!="") {
-        config.setStatus(wio_line2_str);
-      }
-      else if(wio_line1_str!="") {
-        config.setStatus(wio_line2_str);
-      }
     }
     else if (wio_line1_str.trim() == "" || wio_line2_str.trim() == "") 
     { fill(0,0,0);
@@ -865,6 +863,8 @@ void handle_metainfo(byte[] b, int len) {
     textSize(25);
     String cc_mhz = String.format("%3.5f", center_freq_mhz);
     text("FREQ: "+cc_mhz+" MHz",550,340); 
+    if (phase2 >0)  {fill(col_def_indicator); text("P2",850,340); fill(col7);}
+    if (phase2 ==0) {fill(col_def_indicator); text("P1",850,340); fill(col7);}
 
     //Line8
     fill(0,0,0); //color
