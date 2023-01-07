@@ -48,6 +48,8 @@ public class config_frame extends javax.swing.JFrame {
   public int busy=0;
   private int ack_time=0;
 
+  public int read_timeout=0;
+
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
     public config_frame(MicroP25RXMon p) {
@@ -164,6 +166,8 @@ public class config_frame extends javax.swing.JFrame {
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
     public void addString(String str) {
+      read_timeout=200;
+
       ta.append(str);
       ta.setCaretPosition( ta.getText().length() );
       total_bytes += str.length();
@@ -231,6 +235,7 @@ public class config_frame extends javax.swing.JFrame {
       send_frame( b, b.length, 0, 1, packet_id);   //port 1 is a \n-terminated command string
 
       busy=1;
+      read_timeout=200;
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -269,6 +274,13 @@ public class config_frame extends javax.swing.JFrame {
           //send_frame timeout, retry
           send_frame( data_frame, send_len, data_frame_off, 2, packet_id);   //port 2 is write to mem 
           ack_time=5;
+        }
+      }
+
+      if( read_timeout>0) {
+        read_timeout--;
+        if(read_timeout==0) {
+          busy=0;
         }
       }
     }

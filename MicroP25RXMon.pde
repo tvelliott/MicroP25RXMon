@@ -19,7 +19,7 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-int app_ver = 2023010701;
+int app_ver = 2023010702;
 
 import processing.serial.*;
 import java.nio.*;
@@ -361,10 +361,12 @@ void process_buffer(byte b) {
             if(out_of_seq==0 && buf_len<512) {
               config.setStatus("Read Finished With No Errors");
               config.busy=0;
+              config.read_timeout=0;
             }
             else if(out_of_seq>0 && buf_len<512) {
               config.setStatus("Errors detect in read. Try Again");
               config.busy=0;
+              config.read_timeout=0;
             }
           }
         break;
