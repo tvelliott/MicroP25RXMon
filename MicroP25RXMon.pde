@@ -19,7 +19,7 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-int app_ver = 2023010703;
+int app_ver = 2023010704;
 
 import processing.serial.*;
 import java.nio.*;
@@ -810,6 +810,12 @@ void handle_metainfo(byte[] b, int len) {
       text(wio_line2_str.trim(), 550, 40);
       fill(0,0,0);
        textSize(30);
+      if(wio_line2_str!="") {
+        config.setStatus(wio_line2_str);
+      }
+      else if(wio_line1_str!="") {
+        config.setStatus(wio_line2_str);
+      }
     }
     else if (wio_line1_str.trim() == "" || wio_line2_str.trim() == "") 
     { fill(0,0,0);
