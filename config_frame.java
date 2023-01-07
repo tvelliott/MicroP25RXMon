@@ -45,6 +45,8 @@ public class config_frame extends javax.swing.JFrame {
   int data_frame_off;
 
   final JFileChooser fc;
+  public int busy=0;
+  private int ack_time=0;
 
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
@@ -209,11 +211,14 @@ public class config_frame extends javax.swing.JFrame {
       if(len > 0) {
         parent.serial.write(serial_buffer);
       }
+
     }
 
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
     private void read_configActionPerformed(java.awt.event.ActionEvent evt) {
+      if(busy!=0) return;
+
       System.out.println("read config");
       total_bytes=0;
       data_frame_off=0;
@@ -224,11 +229,15 @@ public class config_frame extends javax.swing.JFrame {
       packet_id=0; //increment this on ack for >1 frames 
       byte[] b = new String("send_config\r\n").getBytes();
       send_frame( b, b.length, 0, 1, packet_id);   //port 1 is a \n-terminated command string
+
+      busy=1;
     }
 
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
     private void write_configActionPerformed(java.awt.event.ActionEvent evt) {
+      if(busy!=0) return;
+
       System.out.println("write config");
 
       try {
@@ -242,16 +251,33 @@ public class config_frame extends javax.swing.JFrame {
         if(send_len>512) send_len=512;
 
         send_frame( data_frame, send_len, data_frame_off, 2, packet_id);   //port 2 is write to mem 
+        ack_time=5;
+
       } catch(Exception e) {
         e.printStackTrace();
       }
+      busy=1;
     }
-
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    public void config_tick() {
+      if( ack_time>0 ) {
+        ack_time--;
+        if(ack_time==0) {
+          int send_len = data_frame_len;
+          if(send_len>512) send_len=512;
+          //send_frame timeout, retry
+          send_frame( data_frame, send_len, data_frame_off, 2, packet_id);   //port 2 is write to mem 
+          ack_time=5;
+        }
+      }
+    }
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
     void rx_ack(int rxid) {
       if(packet_id==rxid) {
         packet_id++;
+        ack_time=5;
 
         int tot = data_frame_len;
 
@@ -281,6 +307,9 @@ public class config_frame extends javax.swing.JFrame {
         else {
           if( (tot + data_frame_off) == bytes_to_send ) {
             parent.print("\r\nsent configuration ok");
+            setStatus("Send Config With No Errors. Please Wait For Restore / Re-boot.");
+            busy=0;
+            ack_time=0;
           }
         }
       }

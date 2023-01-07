@@ -19,7 +19,7 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-int app_ver = 2023010605;
+int app_ver = 2023010701;
 
 import processing.serial.*;
 import java.nio.*;
@@ -198,6 +198,7 @@ void draw()
   }
   
   aud.audio_tick();
+  config.config_tick();
   
   if(aud.audio_active==0) {
    stroke(0,0,0);
@@ -354,15 +355,23 @@ void process_buffer(byte b) {
           serial_packet_count++;
           port_to=150;
           if(buf_len<512) {
-            print("\r\nlast packet received");
+            //print("\r\nlast packet received");
             if( out_of_seq>0) print( String.format("\r\n%d out of seq packets detected", out_of_seq) );
             else if( out_of_seq==0) print( String.format("\r\nno errors detected", out_of_seq) );
+            if(out_of_seq==0 && buf_len<512) {
+              config.setStatus("Read Finished With No Errors");
+              config.busy=0;
+            }
+            else if(out_of_seq>0 && buf_len<512) {
+              config.setStatus("Errors detect in read. Try Again");
+              config.busy=0;
+            }
           }
         break;
 
         case  7 :
           if( buf_len==0 ) {  //ACK has no data
-            print("\r\nACK "+packet_id);
+            //print("\r\nACK "+packet_id);
             config.rx_ack(packet_id);
             port_to=150;
           }
@@ -795,6 +804,12 @@ void handle_metainfo(byte[] b, int len) {
       text(wio_line2_str.trim(), 550, 40);
       fill(0,0,0);
        textSize(30);
+      if(wio_line2_str!="") {
+        config.setStatus(wio_line2_str);
+      }
+      else if(wio_line1_str!="") {
+        config.setStatus(wio_line2_str);
+      }
     }
     else if (wio_line1_str.trim() == "" || wio_line2_str.trim() == "") 
     { fill(0,0,0);
