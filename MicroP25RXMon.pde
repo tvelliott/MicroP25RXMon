@@ -19,7 +19,7 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-int app_ver = 2023010704;
+int app_ver = 2023010705;
 
 import processing.serial.*;
 import java.nio.*;
@@ -861,7 +861,8 @@ void handle_metainfo(byte[] b, int len) {
     String eevm = String.format("%2.1f",evm_p);
     String eerate = String.format("%2.4f",erate);
     text("EVM "+eevm+"  ERATE "+eerate,550,290);
-
+      if (on_control_b !=0) text("TSBK/SEC "+tsbk_sec,750,290);
+      
     //Line7
     fill(0,0,0); //color
     rect(520, 300, 512, 50); // erase
