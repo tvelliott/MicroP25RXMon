@@ -234,6 +234,14 @@ public class config_frame extends javax.swing.JFrame {
       byte[] b = new String("send_config\r\n").getBytes();
       send_frame( b, b.length, 0, 1, packet_id);   //port 1 is a \n-terminated command string
 
+      try {
+        //sleep on Mac M1 platform only
+        if( System.getProperty("os.arch").toLowerCase().equals("aarch64")) {
+          Thread.sleep(2000);
+        }
+      } catch(Exception e) {
+      }
+
       busy=1;
       read_timeout=200;
     }
