@@ -19,7 +19,7 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-int app_ver = 2023011101;
+int app_ver = 2023011001;
 
 import processing.serial.*;
 import java.nio.*;
@@ -345,9 +345,10 @@ void process_buffer(byte b) {
           }
         break;
         case  5 :
-          try {
+          try{
             handle_metainfo(buf,buf_len);
-          } catch(Exception e) {
+          }
+          catch(Exception e) {
             e.printStackTrace();
           }
           serial_packet_count++;
