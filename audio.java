@@ -141,7 +141,7 @@ SourceDataLine sourceDataLine;
   }
   ///////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////
-  void play_audio(byte[] b, int len) {
+  void play_audio(byte[] b, int len, int demod_mode) {
 
     while(do_new_audio==1);
 
@@ -153,7 +153,7 @@ SourceDataLine sourceDataLine;
       inbytes[i] = b[i];
       if(b[i] > 64) thresh=1;
     }
-    if(thresh>0) {
+    if(thresh>0 || demod_mode<2) {
       audio_len = len;
       do_new_audio=1;
     }

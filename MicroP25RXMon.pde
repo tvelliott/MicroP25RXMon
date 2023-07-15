@@ -54,6 +54,8 @@ int metamod=0;
 int serial_packet_count=0;
 int found_port=0;
 
+int demod_mode;
+
 String[] ports;
 int port_idx=0;
 int port_to=0;
@@ -309,7 +311,7 @@ void process_buffer(byte b) {
         break;
         case  2 :
           if(have_gpu>0) draw_audio(buf,buf_len);
-          aud.play_audio(buf,buf_len);
+          aud.play_audio(buf,buf_len, demod_mode);
           serial_packet_count++;
           port_to=150;
         break;
@@ -596,6 +598,7 @@ void handle_metainfo(byte[] b, int len) {
   float evm_p = bb3.getFloat();
 
   int demod = bb3.getInt();
+    demod_mode=demod;
   int did_freq_cc_lock = bb3.getInt();
 
 
