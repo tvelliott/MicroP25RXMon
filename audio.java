@@ -148,11 +148,14 @@ SourceDataLine sourceDataLine;
     if(inbytes==null || inbytes.length!=len) inbytes = new byte[len];
     if(outbytes==null || outbytes.length!=len*4) outbytes = new byte[ len*4 ]; 
 
+    int thresh=0;
     for(int i=0;i<len;i++) {
       inbytes[i] = b[i];
+      if(b[i] > 64) thresh=1;
     }
-
-    audio_len = len;
-    do_new_audio=1;
+    if(thresh>0) {
+      audio_len = len;
+      do_new_audio=1;
+    }
   }
 }
