@@ -31,6 +31,8 @@ class audio {
   byte[] outbytes=null;
   byte[] inbytes=null;
   int audio_len;
+  
+  private int demod=0;
 
   final int BUFFER_LEN = 12000; //good values are between 8000 and 12000
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,6 +92,7 @@ class audio {
 
             }
 
+            
             Thread.sleep(0, 100);
             //System.out.println("avail: "+sourceDataLine.available());
           }
@@ -109,7 +112,7 @@ SourceDataLine sourceDataLine;
   ///////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////
   public audio() {
-    format = new AudioFormat(7950, 16, 2, true, false); //last boolean is endian-type (false=little)
+    format = new AudioFormat(8000, 16, 2, true, false); //last boolean is endian-type (false=little)
     try {
       sourceDataLine = AudioSystem.getSourceDataLine( format);
       sourceDataLine.open(format, BUFFER_LEN);
@@ -144,18 +147,20 @@ SourceDataLine sourceDataLine;
   void play_audio(byte[] b, int len, int demod_mode) {
 
     while(do_new_audio==1);
+    
+    demod = demod_mode;
 
     if(inbytes==null || inbytes.length!=len) inbytes = new byte[len];
     if(outbytes==null || outbytes.length!=len*4) outbytes = new byte[ len*4 ]; 
 
-    int thresh=0;
+    
     for(int i=0;i<len;i++) {
       inbytes[i] = b[i];
-      if(b[i] > 64) thresh=1;
+      
     }
-    if(thresh>0 || demod_mode<2) {
+    
       audio_len = len;
       do_new_audio=1;
-    }
+
   }
 }
