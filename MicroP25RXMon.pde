@@ -35,6 +35,8 @@ int showTG_history=1;
 //int serial_port = 0; //port is auto detected
 int serial_baud_rate = 480000000;
 
+int draw_config_mod;
+
 Serial serial=null;
 
 byte[] in_buffer;
@@ -326,7 +328,7 @@ void process_buffer(byte b) {
           serial_packet_count++;
           port_to=150;
           
-          if(did_draw_config==0) {
+          if(did_draw_config==0 || draw_config_mod++%10==0) {
             //draw config button
             fill(col1);
             stroke(col1);
@@ -861,6 +863,8 @@ void handle_metainfo(byte[] b, int len) {
     textSize(20);
     if (demod == 0) dmod = "LSM";
     if (demod == 1) dmod = "FM";
+    if (demod == 2) dmod = "FMNB";
+    if (demod == 3) dmod = "AM";
     text("SITE "+site_id+", RFSS "+rfss_id+" DEMOD "+dmod,550,240);
 
     //Line6
