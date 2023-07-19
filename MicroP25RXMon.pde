@@ -273,7 +273,7 @@ void process_buffer(byte b) {
     rx_state++;
   } else if( rx_state == 7 ) { //get lower 8bits len
     buf_len |= (int) ((int) val);
-    if(buf_len > 2048) rx_state=0;
+    if(buf_len > 4096) rx_state=0;
       else rx_state++;
   }
   else if( rx_state == 8 ) { 
@@ -766,7 +766,17 @@ void handle_metainfo(byte[] b, int len) {
   col_def_indicator = rgb565_to_color( bb3.getShort());
   col_def_const = rgb565_to_color( bb3.getShort());
 
-  byte padd1 = bb3.get();
+  byte draw_const_circles = bb3.get();
+  bb3.get();
+  bb3.get();
+  bb3.get();
+  float audio_volume_f = bb3.getFloat();
+  int speaker_en = bb3.getInt();
+  int decoder = bb3.getInt();
+  int squelch_dbm = bb3.getInt();
+
+  bb3.get();
+  bb3.get();
   bb3.get();
   bb3.get();
   bb3.get();
@@ -889,8 +899,26 @@ void handle_metainfo(byte[] b, int len) {
     textSize(25);
     String cc_mhz = String.format("%3.5f", center_freq_mhz);
     text("FREQ: "+cc_mhz+" MHz",550,340); 
-    if (phase2 >0)  {fill(col_def_indicator); text("P2",850,340); fill(col7);}
-    if (phase2 ==0) {fill(col_def_indicator); text("P1",850,340); fill(col7);}
+
+    if(decoder==0 && demod < 2) { //P25
+      if (phase2 >0)  {fill(col_def_indicator); text("P2",850,340); fill(col7);}
+      if (phase2 ==0) {fill(col_def_indicator); text("P1",850,340); fill(col7);}
+    }
+    else if(decoder==1) { //DMR
+      fill(col_def_indicator); 
+      text("DMR",850,340); 
+      fill(col7);
+    }
+    else if(decoder==2) { //ACA
+      fill(col_def_indicator); 
+      text("ACA",850,340); 
+      fill(col7);
+    }
+    else if(decoder==3) { //PGR
+      fill(col_def_indicator); 
+      text("PGR",850,340); 
+      fill(col7);
+    }
 
     //Line8
     fill(0,0,0); //color
