@@ -157,31 +157,36 @@ void draw()
 
   if(found_port==0 && port_to==0) {
     ports = Serial.list();
-    if(ports!=null) { 
-      serial_packet_count=0;
-      if(port_idx>=ports.length) port_idx=0;
 
-      port_name = ports[port_idx++];
-      println("trying port "+port_name);
+    try {
+      if(ports!=null && ports.length>0) {
+        serial_packet_count=0;
+        if(port_idx>=ports.length) port_idx=0;
+
+        port_name = ports[port_idx++];
+        println("trying port "+port_name);
 
 
-      try {
-        if(serial!=null) serial.stop();
-        if(serial!=null) serial.clear();
-      } catch(Exception e) {
-        e.printStackTrace();
-        found_port=0;
+        try {
+          if(serial!=null) serial.stop();
+          if(serial!=null) serial.clear();
+        } catch(Exception e) {
+          e.printStackTrace();
+          found_port=0;
+        }
+
+        try {
+          serial = new Serial(this, port_name, serial_baud_rate);
+          port_to=150;
+          found_port=0;
+        } catch(Exception e) {
+          e.printStackTrace();
+          found_port=0;
+        }
+
       }
-
-      try {
-        serial = new Serial(this, port_name, serial_baud_rate);
-        port_to=150;
-        found_port=0;
-      } catch(Exception e) {
-        e.printStackTrace();
-        found_port=0;
-      }
-
+    } catch(Exception e) {
+      e.printStackTrace();
     }
 
   }
