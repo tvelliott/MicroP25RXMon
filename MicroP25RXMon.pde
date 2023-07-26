@@ -880,6 +880,7 @@ void handle_metainfo(byte[] b, int len) {
     if (demod == 1) dmod = "FM";
     if (demod == 2) dmod = "FMNB";
     if (demod == 3) dmod = "AM";
+    if (demod == 4) dmod = "AM+AGC";
     text("SITE "+site_id+", RFSS "+rfss_id+" DEMOD "+dmod,550,240);
 
     //Line6
